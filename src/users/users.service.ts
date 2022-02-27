@@ -8,6 +8,7 @@ import { BanUserDto } from "./dto/ban-user.dto";
 import { UserRoles } from "../roles/user-roles.model";
 
 import { Role } from "../roles/roles.model";
+import { access } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +19,7 @@ export class UsersService {
 
     async createUser(dto: CreateUserDto) {
         const user = await this.userRepository.create(dto);
-        const role = await this.roleService.getRoleByValue("ADMIN")
+        const role = await this.roleService.getRoleByValue(1)
         // await user.$set('roles', [role.id])
         // user.roles = [role]
         // console.log(user)
@@ -33,6 +34,7 @@ export class UsersService {
     async addRole(dto: AddRoleDto) {
         const user = await this.userRepository.findByPk(dto.userId);
         const role = await this.roleService.getRoleByValue(dto.value);
+        console.log(role)
         if (role && user) {
             await user.$add('role', role.id);
             return dto;
@@ -55,7 +57,7 @@ export class UsersService {
         const users = await this.userRepository.findAll({
             include: {
                 model: Role,
-                attributes: ['value'],
+                attributes: ['description'],
                 through: {
                     attributes: []
                 }
@@ -64,34 +66,107 @@ export class UsersService {
             nest: true,
         });
 
-        users.map(item => item.roles = Object.values(item.roles))
+        let getValue = (string) => {
+            return string.split('').reduce((acc, curr) => {
+                return acc += (' ' + [...new Set(string)].findIndex(key => key === curr))
+            }, []);
+        };
+        console.log(getValue('aaavdffdvvvaa'));
+
+        let arr1 = Object.values(users.reduce((acc, curr) => {
+            if (acc[curr.id]) acc[curr.id].roles.push(...Object.values(curr.roles));
+            else acc[curr.id] = { ...curr, roles: Object.values(curr.roles) }
+            return acc;
+        }, {}));
+
+        return arr1
+
+        
+
+        // принемать слово\
+        // разбивать его на массив\
+        // получить массив бвув\
+        // получить ключ: буква\
+        // отфильтровать объект по ключам
+        // у каждого символа должен быть свой ключ
+        // только уникальные символы
+        // выводить все ключи
+
+        // let sumId = (value) => {
+        //     return value.split('').reduce((i) => i)      
+        // }
+        // console.log(sumId("javascript"))
+
+        // let getValue = (string, letter) => {
+        //     return string.split('').reduce((acc, curr) => acc += (curr === letter), 0);
+        // };
+        // console.log(getValue('abcabca', 'a'));
+
+        //users.map(item => item.roles = Object.values(item.roles))
+
+        ////////////////////////////////////////////
+
         // const arr1 = [], arr2 = []
         // users.filter((item) => {
         //     if (!arr1.some((element) => element.id === item.id)) {
         //         arr1.push(item);
         //     }
-        //     else(
+        //     else {
         //         arr2.push(item)
-        //     )
+        //     }
+
         // });
         // for (let i = 0; i < arr1.length; i++) {
-        //      arr1[i].id === arr2[i].id ? arr1[i].roles = arr1[i].roles.concat(arr2[i].roles) : arr1[i].roles
+        //     arr1[i].id === arr2[i].id ? arr1[i].roles = arr1[i].roles.concat(arr2[i].roles) : arr1[i].roles
         // }
-//////////////////////////////////////////////////////////
 
-        let i = 0;
-        let arr = users.reduce(function (newArr, value) {
-            if (users[i] === value[i]) {
-                newArr.push(value[i]);
-            }
-            value[i];
-            i++
-            return newArr;
-          }, [] );
+        //////////////////////////////////////////
 
-        console.log(arr)
+        // let arr1 = users.reduce(function (newArr, value, i) {
+        //     if(!newArr.some((element) => element.id === value.id)){
+        //         newArr.push({...users[i], roles: Object.values(users[i].roles)});
+        //     } else {
+        //         newArr[newArr.length - 1].roles.push(...Object.values(users[i].roles));
+        //     }
+        //     return newArr;
+        // }, []);
 
-        return users
+        // let word = "exeedteam";
+
+        // let sum = word.split('').reduce(acc, curr) => {
+        //     return acc + curr
+        // }
+
+        // console.log(ind)
+
+
+
+        // передавать слово и разбить по буквам
+        // получать (id) каждой буквы
+        // получать общее колличество букв в слове
+
+
+
+
+
+        ///////////////////////////////////////////////
+
+        // let arr = users.reduce(function (newArr, value, i) {
+        //     if(i % 2 === 0) {
+        //         newArr.push(value);
+        //         newArr[newArr.length - 1].roles.concat(users[i + 1].roles)
+        //     }
+        //     else(
+        //         newArr[i].roles.concat(users[i + 1].roles)
+        //     )
+        //     return newArr;
+        // }, []);
+
+        // console.log(arr)
+
+        //////////////////////////////////////////////////////////
+
+
 
         // for (let i = 0; i < newArr.length; i++) {
         //     console.log(newArr[i].roles, "<<<1")

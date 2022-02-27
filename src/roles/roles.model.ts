@@ -4,7 +4,7 @@ import {User} from "../users/users.model";
 import {UserRoles} from "./user-roles.model";
 
 interface RoleCreationAttrs {
-    value: string;
+    value: number;
     description: string;
 }
 
@@ -16,8 +16,8 @@ export class Role extends Model<Role, RoleCreationAttrs> {
     id: number;
 
     @ApiProperty({example: 'ADMIN', description: 'Уникальное Значение роли '})
-    @Column({type: DataType.STRING, unique: true, allowNull: true})
-    value: string;
+    @Column({type: DataType.INTEGER, unique: true, allowNull: true})
+    value: number;
 
     @ApiProperty({example: 'Администратор', description: 'Описание роли'})
     @Column({type: DataType.STRING, allowNull: true})
